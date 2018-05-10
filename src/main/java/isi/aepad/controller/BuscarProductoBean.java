@@ -27,6 +27,11 @@ public class BuscarProductoBean implements Serializable{
 	private Integer precioMaximo;
 	private String resultado;
 	private List<ProductoDTO> productos;
+	private List<ProductoDTO> compra;
+
+	private Integer idSeleccionado;
+
+	
 	
 	@PostConstruct
 	public void init() {
@@ -35,6 +40,7 @@ public class BuscarProductoBean implements Serializable{
 		this.precioMaximo=15;
 		this.resultado="no se busco nada";
 		this.productos = new ArrayList<ProductoDTO>();
+		this.compra = new ArrayList<ProductoDTO>();
 	}
 	
 	public String buscar() {
@@ -47,7 +53,7 @@ public class BuscarProductoBean implements Serializable{
 			try(JsonReader reader = Json.createReader(new StringReader(tmp))){
 				JsonArray jsonArr = reader.readArray();
 				for(int i = 0;i<jsonArr.size();i++) {
-					JsonObject obj = jsonArr.getJsonObject(0);
+					JsonObject obj = jsonArr.getJsonObject(i);
 					this.productos.add(new ProductoDTO(obj.getInt("id"),obj.getString("descripcion"),obj.getJsonNumber("precio").doubleValue()));
 				}
 				
@@ -56,9 +62,23 @@ public class BuscarProductoBean implements Serializable{
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return "listaProductos";
 	}
 
+	public String comprar() {
+		try {
+			ProductoDTO aux = new ProductoDTO();
+			aux.setId(this.idSeleccionado);
+			Integer indice = this.productos.indexOf(aux); 
+			ProductoDTO productoComprar = this.productos.get(indice);			
+			this.productos.remove(indice);
+			this.compra.add(productoComprar);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return "miCompra";
+	}
+	
 	public Integer getPrecioMinimo() {
 		return precioMinimo;
 	}
@@ -82,6 +102,31 @@ public class BuscarProductoBean implements Serializable{
 	public void setResultado(String resultado) {
 		this.resultado = resultado;
 	}
-	
+
+	public List<ProductoDTO> getProductos() {
+		return productos;
+	}
+
+	public void setProductos(List<ProductoDTO> productos) {
+		this.productos = productos;
+	}
+
+	public List<ProductoDTO> getCompra() {
+		return compra;
+	}
+
+	public Integer getIdSeleccionado() {
+		return idSeleccionado;
+	}
+
+	public void setIdSeleccionado(Integer idSeleccionado) {
+		this.idSeleccionado = idSeleccionado;
+	}
+
+	public void setCompra(List<ProductoDTO> compra) {
+		this.compra = compra;
+	}
+
+
 	
 }
